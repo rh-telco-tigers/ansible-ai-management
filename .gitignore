@@ -1,0 +1,12 @@
+.DS_Store
+*.txt
+__stuff/**
+old_roles
+old_plays
+inventory/jinkit.yml
+inventory/jinkit-libvirt.yml
+.clusters
+inventory-example.ini
+scratchpad.md
+roles/old_deleteAILibvirtGuest
+roles/template

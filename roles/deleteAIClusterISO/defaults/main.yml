@@ -1,0 +1,54 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Cluster Details (order is important):
+clusterID: "622fa8ca-e797-4185-8230-b40ebcb6187b"
+fileLocalISO: ./.clusters/{{ clusterID }}/{{ clusterID }}.iso
+fileRemoteISO: /var/lib/libvirt/boot/ai-discovery-{{ clusterID }}.iso
+
+# Global Details:
+secure: False
+state: delete
+debug: True
+disconnected: False
+
+# Cluster Details (order is important):
+clusterName: "customer-001-rdyxeg7y"
+clusterVersion: "4.6"
+clusterBaseDomain: "dnvrco.lumen.com"
+clusterNetworkHostPrefix: 24
+clusterEndpointIPAPI: "192.168.60.222"
+clusterEndpointIPAPIDHCP: "false"
+clusterEndpointIPIngress: "192.168.60.223"
+clusterEndpointIPIngressDHCP: "false"
+clusterNetworkProxyHTTP: ""
+clusterNetworkProxyHTTPS: ""
+clusterNetworkProxyNo: ""
+clusterNetworkUserManaged: "false"
+clusterNetworkCIDRPod: "10.128.0.0/14"
+clusterNetworkCIDRService: "172.30.0.0/16"
+
+# User Details:
+userAuthSSHKeyPublic: "{{ lookup('file', '/Users/bjozsa/.ssh/id_rsa.pub') }}"
+userAuthPullSecret: "{{ lookup('file', '/Users/bjozsa/.ocp/pull_secret.json') }}"
+
+# Assisted Installer Details (order is important):
+assistedInstallerHost: "{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}"
+assistedInstallerPort: 8090
+assistedInstallerURLBase: "{{ secure | ternary('https', 'http') }}://{{ assistedInstallerHost }}:{{ assistedInstallerPort }}/api/assisted-install/v1"
+assistedInstallerURLClusters: "{{ assistedInstallerURLBase }}/clusters"
+assistedInstallerURLCredentials: "{{ assistedInstallerURLBase }}/clusters/{{ clusterID }}/credentials"
+

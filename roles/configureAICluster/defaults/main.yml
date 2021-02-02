@@ -1,0 +1,98 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# bbj - New Values below this point:
+RHCOS_VERSION: "latest"
+BASE_OS_IMAGE: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.6/{{ RHCOS_VERSION }}/rhcos-live.x86_64.iso"
+OAS_UI_IMAGE: "quay.io/ocpmetal/ocp-metal-ui:latest"
+OAS_DB_IMAGE: "quay.io/ocpmetal/postgresql-12-centos7"
+OAS_HOSTDIR: "/opt/assisted-service"
+OAS_ENV_FILE: "{{ OAS_HOSTDIR }}/onprem-environment"
+OAS_UI_CONF: "{{ OAS_HOSTDIR }}/nginx-ui.conf"
+OAS_LIVE_CD: "{{ OAS_HOSTDIR }}/rhcos-live.x86_64.iso"
+OAS_COREOS_INSTALLER: "{{ OAS_HOSTDIR }}/coreos-installer"
+
+# Directory and File Settings:
+DIR_OAS_BASE: "/opt/assisted-service"
+FILE_DST_CFG_NGINX: "{{ DIR_OAS_BASE }}/nginx-ui.conf"
+FILE_DST_ENV_PODMAN: "{{ DIR_OAS_BASE }}/onprem-environment"
+
+# RHCOS Settings:
+RHCOS_LIVEISO_SRC: "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.6/latest/rhcos-live.x86_64.iso"
+RHCOS_LIVEISO_CHK: "38d8e14491758b8b7052cb8e82704fe25b042875a3fbaa5298bd4f1fb1fc416e"
+RHCOS_LIVEISO_ALG: "sha256"
+RHCOS_LIVEISO_DST: "{{ DIR_OAS_BASE }}/rhcos-live.x86_64.iso"
+
+# PodMan Settings:
+## Images/Tags
+REGISTRY_IMAGE_AI_SERVICE: "quay.io/ocpmetal/assisted-service"
+REGISTRY_TAG_AI_SERVICE: "stable"
+REGISTRY_IMAGE_OCP_METAL_UI: "quay.io/ocpmetal/ocp-metal-ui"
+REGISTRY_TAG_OCP_METAL_UI: "stable"
+REGISTRY_IMAGE_RHCOS_INSTALLER: "quay.io/coreos/coreos-installer"
+REGISTRY_TAG_RHCOS_INSTALLER: "release"
+REGISTRY_IMAGE_OCP_METAL_DB: "quay.io/ocpmetal/postgresql-12-centos7"
+REGISTRY_TAG_OCP_METAL_DB: "latest"
+
+# Assisted Installer/Service Settings:
+OAS_CFG_HOST_LISTENER_ADDR: "10.198.6.70"
+OAS_CFG_HOST_LISTENER_PORT: 8888
+
+# PLEASE USE 1-to-1 VARIABLES: Ansible to Assisted Service variables from assisted installer (for ease of consistency)
+# Link: https://github.com/openshift/assisted-service/blob/ac76ddc0717862359951eec05d621eb161ca682c/tools/update_bm_cm.py
+POSTGRESQL_DATABASE: installer
+POSTGRESQL_PASSWORD: admin
+POSTGRESQL_USER: admin
+DB_HOST: "127.0.0.1"
+DB_PORT: 5432
+DB_USER: admin
+DB_PASS: admin
+DB_NAME: installer
+SKIP_CERT_VERIFICATION: true
+SERVICE_BASE_URL: "http://{{ OAS_CFG_HOST_LISTENER_ADDR }}:8090"
+DEPLOY_TARGET: onprem
+DUMMY_IGNITION: false
+OPENSHIFT_VERSIONS: '{"4.6":{"release_image":"quay.io/openshift-release-dev/ocp-release:4.6.8-x86_64"},"4.7":{"release_image":"quay.io/openshift-release-dev/ocp-release@sha256:2419f9cd3ea9bd114764855653012e305ade2527210d332bfdd6dbdae538bd66"}}'
+OPENSHIFT_INSTALL_RELEASE_IMAGE: "quay.io/openshift-release-dev/ocp-release:4.6.9-x86_64"
+HW_VALIDATOR_MIN_CPU_CORES: 2
+HW_VALIDATOR_MIN_CPU_CORES_WORKER: 2
+HW_VALIDATOR_MIN_CPU_CORES_MASTER: 4
+HW_VALIDATOR_MIN_RAM_GIB: 3
+HW_VALIDATOR_MIN_RAM_GIB_WORKER: 3
+HW_VALIDATOR_MIN_RAM_GIB_MASTER: 8
+HW_VALIDATOR_MIN_DISK_SIZE_GIB: 10
+INSTALLER_IMAGE: 
+CONTROLLER_IMAGE: 
+SERVICE_URL: 
+SERVICE_PORT: 
+AGENT_DOCKER_IMAGE: 
+BASE_DNS_DOMAINS: 
+PUBLIC_CONTAINER_REGISTRIES:
+PULL_SECRET:
+IGNITION_GENERATE_IMAGE:
+IMAGE_BUILDER:
+CONNECTIVITY_CHECK_IMAGE:
+HARDWARE_INFO_IMAGE:
+INVENTORY_IMAGE:
+OCM_BASE_URL:
+
+# Examples:
+## Experimental: Single Node deployment
+# INSTALLER_IMAGE=quay.io/eranco74/assisted-installer:single_node_onprem
+# CONTROLLER_IMAGE=quay.io/eranco74/assisted-installer-controller:single_node_onprem
+#
+## Customization: Registry overrides
+# PUBLIC_CONTAINER_REGISTRIES: "quay.io,registry.access.redhat.com,registry.redhat.io"

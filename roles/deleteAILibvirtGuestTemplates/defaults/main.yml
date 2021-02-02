@@ -1,0 +1,44 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Cluster Details (order is important):
+clusterID: "622fa8ca-e797-4185-8230-b40ebcb6187b"
+libvirtGuestName: kubenode24
+dirRemoteLibvirtBase: /opt/ocp-demos/libvirt/guests
+dirRemoteLibvirtBoot: /var/lib/libvirt/boot
+dirRemoteLibvirtImages: /var/lib/libvirt/images
+fileLocalISO: ./.clusters/{{ clusterID }}/{{ clusterID }}.iso
+fileRemoteISO: "{{ dirRemoteLibvirtBoot }}/ai-discovery-{{ clusterID }}.iso"
+fileRemoteLibvirtGuestLog: "{{ dirRemoteLibvirtBase }}/{{ libvirtGuestName }}/{{ libvirtGuestName }}.log"
+
+libvirtGuestVirtType: kvm
+libvirtGuestExecutionDelay: 5
+libvirtGuestComputeMemory: 16384
+libvirtGuestComputeVCPUs: 4
+libvirtGuestAccelerate: True
+libvirtGuestAutoStart: True
+libvirtGuestOSVariant: "rhel8.3"
+libvirtGuestDiskCDROM: "{{ fileRemoteISO }}"
+libvirtGuestDiskPath: "{{ dirRemoteLibvirtImages }}/{{ libvirtGuestName }}.qcow2"
+libvirtGuestDiskSize: "120"
+libvirtGuestDiskBus: "virtio"
+libvirtGuestDiskFormat: "qcow2"
+libvirtGuestNetworkMAC: "0e:00:00:03:60:24"
+libvirtGuestNetworkBridge: "br60"
+libvirtGuestNetworkModel: virtio
+libvirtGuestGraphicsVNCPort: 5924
+libvirtGuestGraphicsVNCListen: "0.0.0.0"
+libvirtGuestGraphicsVNCPassword: "redhat"

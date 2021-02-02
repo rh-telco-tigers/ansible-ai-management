@@ -1,0 +1,58 @@
+########################################################################
+# file: /opt/assisted-service/onprem-environment
+########################################################################
+# Note: bbj - Make each of these usable variables in defaults later
+POSTGRESQL_DATABASE={{ POSTGRESQL_DATABASE }}
+POSTGRESQL_PASSWORD={{ POSTGRESQL_PASSWORD }}
+POSTGRESQL_USER={{ POSTGRESQL_USER }}
+DB_HOST={{ DB_HOST }}
+DB_PORT={{ DB_PORT }}
+DB_USER={{ DB_USER }}
+DB_PASS={{ DB_PASS }}
+DB_NAME={{ DB_NAME }}
+
+# This is the IP address or dns name that the nodes will report to:
+SERVICE_BASE_URL={{ SERVICE_BASE_URL }}
+DEPLOY_TARGET={{ DEPLOY_TARGET }}
+DUMMY_IGNITION={{ DUMMY_IGNITION }}
+
+OPENSHIFT_INSTALL_RELEASE_IMAGE={{ OPENSHIFT_INSTALL_RELEASE_IMAGE }}
+OPENSHIFT_VERSIONS={{ OPENSHIFT_VERSIONS }}
+
+
+# Examples of host IPs service could be listening on below
+#SERVICE_IPS=192.168.4.159,10.88.0.1
+# Note: bbj - Return to improve this later
+#SERVICE_IPS="{{ ansible_all_ipv4_addresses }}"
+SERVICE_IPS="{{ OAS_CFG_HOST_LISTENER_ADDR }}"
+
+# Required when using self-signed certifications or no certificates
+SKIP_CERT_VERIFICATION={{ SKIP_CERT_VERIFICATION }}
+
+# https://github.com/openshift/assisted-test-infra/blob/master/discovery-infra/update_assisted_service_cm.py#L20
+HW_VALIDATOR_MIN_CPU_CORES={{ HW_VALIDATOR_MIN_CPU_CORES }}
+HW_VALIDATOR_MIN_CPU_CORES_WORKER={{ HW_VALIDATOR_MIN_CPU_CORES_WORKER }}
+HW_VALIDATOR_MIN_CPU_CORES_MASTER={{ HW_VALIDATOR_MIN_CPU_CORES_MASTER }}
+HW_VALIDATOR_MIN_RAM_GIB={{ HW_VALIDATOR_MIN_RAM_GIB }}
+HW_VALIDATOR_MIN_RAM_GIB_WORKER={{ HW_VALIDATOR_MIN_RAM_GIB_WORKER }}
+HW_VALIDATOR_MIN_RAM_GIB_MASTER={{ HW_VALIDATOR_MIN_RAM_GIB_MASTER }}
+HW_VALIDATOR_MIN_DISK_SIZE_GIB={{ HW_VALIDATOR_MIN_DISK_SIZE_GIB }}
+
+
+#####################################################################################
+########  Single Node deployment
+# Need to be uncommented for single node cluster
+#INSTALLER_IMAGE=quay.io/eranco74/assisted-installer:single_node_onprem
+#CONTROLLER_IMAGE=quay.io/eranco74/assisted-installer-controller:single_node_onprem
+#####################################################################################
+
+#PULL_SECRET=
+#PULL_SECRET=
+#AGENT_DOCKER_IMAGE=
+#IGNITION_GENERATE_IMAGE=
+#BASE_DNS_DOMAINS=
+#IMAGE_BUILDER=
+#CONNECTIVITY_CHECK_IMAGE=
+#HARDWARE_INFO_IMAGE=
+#INVENTORY_IMAGE=
+#OCM_BASE_URL=

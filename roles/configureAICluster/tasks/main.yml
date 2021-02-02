@@ -1,0 +1,177 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+- name: test to ensure that hosts are alive
+  tags: [test, ping]
+  ping:
+
+- name: Print all available facts
+  tags: [test, facts]
+  ansible.builtin.debug:
+    var: OAS_CFG_PULL_SECRET
+
+# Create directories and files for AI
+- name: Create a directory for assisted installer resources
+  tags: [createDirs, createDirAIResources]
+  file:
+    path: "{{ DIR_OAS_BASE }}"
+    state: directory
+    mode: '0755'
+    owner: root
+
+- tags: [createDirs, createDirsData]
+  file:
+    path: "{{ DIR_OAS_BASE }}/data"
+    state: directory
+    mode: '0755'
+    owner: root
+
+- name: Create a directory for assisted installer database
+  tags: [createDirs, createDirDB]
+  file:
+    path: "{{ DIR_OAS_BASE }}/data/postgresql"
+    state: directory
+    mode: '0755'
+    owner: 26
+
+- name: Copy NGINX configuration file to /opt/assisted-service/nginx-ui.conf
+  tags: [copyConfigs, copyNGINXConfig]
+  template:
+    src: nginx-ui.conf.j2
+    dest: "{{ FILE_DST_CFG_NGINX }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy original AI environment file to /opt/assisted-service/onprem-environment.j2
+  tags: [copyConfigs, copyPodmanEnvironment]
+  template:
+    src: onprem-environment.j2
+    dest: "{{ FILE_DST_ENV_PODMAN }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+# Pull images needed for Assisted Installer:
+- name: Pulling Podman image for the AI service
+  tags: [pullImages, podmanPullOAS0]
+  podman_image:
+    name: "{{ REGISTRY_IMAGE_AI_SERVICE }}"
+    tag: "{{ REGISTRY_TAG_AI_SERVICE }}"
+
+- name: Pulling Podman image for the RHCOS Installer
+  tags: [pullImages, podmanPullRHCOSInstaller]
+  podman_image:
+    name: "{{ REGISTRY_IMAGE_RHCOS_INSTALLER }}"
+    tag: "{{ REGISTRY_TAG_RHCOS_INSTALLER }}"
+
+- name: Pulling Podman image for the OCP Metal UI
+  tags: [pullImages, podmanPullOCPMetalUI]
+  podman_image:
+    name: "{{ REGISTRY_IMAGE_OCP_METAL_UI }}"
+    tag: "{{ REGISTRY_TAG_OCP_METAL_UI }}"
+
+- name: Pulling Podman image for the OCP Bare Metal Database
+  tags: [pullImages, podmanPullOCPDB]
+  podman_image:
+    name: "{{ REGISTRY_IMAGE_OCP_METAL_DB }}"
+    tag: "{{ REGISTRY_TAG_OCP_METAL_DB }}"
+
+# Download the RHCOS liveCD:
+- name: Download the RHCOS LiveCD
+  tags: [pullLiveISO, copyRCHOSLiveCD]
+  get_url:
+    url: "{{ RHCOS_LIVEISO_SRC }}"
+    dest: "{{ RHCOS_LIVEISO_DST }}"
+    checksum: "{{ RHCOS_LIVEISO_ALG }}:{{ RHCOS_LIVEISO_CHK }}"
+
+# Pull images and files needed for Assisted Installer:
+# NOTE: bbj - Come back and make this work later
+#- name: Launch an assisted-installer container to copy coreos-installer binary
+#  containers.podman.podman_container:
+#    name: "assisted-installer"
+#    image: "{{ REGISTRY_IMAGE_AI_SERVICE }}:{{ REGISTRY_TAG_AI_SERVICE }}"
+#    entrypoint: /bin/bash
+#    command: cp /usr/sbin/coreos-installer /data/coreos-installer
+#    state: present
+#    recreate: no
+#    privileged: yes
+#    volume:
+#      - /opt/assisted-service:/data
+#    # remove: yes
+- name: Launch an assisted-installer container to copy coreos-installer binary
+  tags: [copyCoreosInstaller]
+  shell:
+    cmd: |
+       podman run --privileged --pull=always -it --rm -v {{ DIR_OAS_BASE }}:/data -w /data --entrypoint /bin/bash {{ REGISTRY_IMAGE_RHCOS_INSTALLER }}:{{ REGISTRY_TAG_RHCOS_INSTALLER }} -c 'cp /usr/sbin/coreos-installer /data/coreos-installer'
+
+- name: Create Assisted Installer container
+  tags: [createAssistedInstaller]
+  containers.podman.podman_pod:
+    name: assisted-installer
+    state: created
+    ports:
+      - 8000:8000
+      - 8090:8090
+      - "{{ OAS_CFG_HOST_LISTENER_PORT }}:8080"
+
+# NOTE: bbj - Come back to clean this up later
+## NOTE: There is no "-d / detatch" option for the containers.podman.podman_pod at this time
+- name: Create Assisted Installer Postgresql DB
+  tags: [createAssistedInstaller]
+  shell:
+    cmd: |
+       podman run -dt --pod assisted-installer --env-file {{ FILE_DST_ENV_PODMAN }} --volume {{ DIR_OAS_BASE }}/data/postgresql:/var/lib/pgsql:z --name db {{ REGISTRY_IMAGE_OCP_METAL_DB }}:{{ REGISTRY_TAG_OCP_METAL_DB }}
+
+# NOTE: bbj - Come back to clean this up later
+## NOTE: There is no "-d / detatch" option for the containers.podman.podman_pod at this time
+- name: Create Assisted Installer UI
+  tags: [createAssistedInstaller]
+  shell:
+    cmd: |
+       podman run -dt --pod assisted-installer --env-file {{ FILE_DST_ENV_PODMAN }} -v {{ OAS_UI_CONF }}:/opt/bitnami/nginx/conf/server_blocks/nginx.conf:z --pull always --name ui {{ REGISTRY_IMAGE_OCP_METAL_UI }}:{{ REGISTRY_TAG_OCP_METAL_UI }}
+
+# NOTE: bbj - Come back to clean this up later
+## NOTE: There is no "-d / detatch" option for the containers.podman.podman_pod at this time
+- name: Create Assisted Installer UI
+  tags: [createAssistedInstaller]
+  shell:
+    cmd: |
+       podman run -dt --pod assisted-installer -v {{ RHCOS_LIVEISO_DST }}:/data/livecd.iso:z -v {{ OAS_COREOS_INSTALLER }}:/data/coreos-installer:z --env-file {{ FILE_DST_ENV_PODMAN }} --env DUMMY_IGNITION=False --pull always --restart always --name installer {{ REGISTRY_IMAGE_AI_SERVICE }}:{{ REGISTRY_TAG_AI_SERVICE }}
+
+# NOTE: bbj - Not going to enable this right now
+- name: Create Assisted Installer UI
+  tags: [checkPodman, checkPodmanContainers]
+  shell:
+    cmd: |
+       podman ps --format json
+#  register: checkPodmanContainers
+
+#- debug: var={{ item }}
+#  tags: [checkPodman, checkPodmanContainers]
+#  with_dict: checkPodmanContainers
+
+# NOTE: bbj - Not going to enable this right now
+- name: Create Assisted Installer UI
+  tags: [checkPodman, checkPodmanPods]
+  shell:
+    cmd: |
+       podman pod ps --format json
+#  register: checkPodmanPods
+
+#- debug: var={{ item }}
+#  tags: [checkPodman, checkPodmanPods]
+#  with_dict: checkPodmanPods

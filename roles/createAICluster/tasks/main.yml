@@ -1,0 +1,86 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+- name: Create cluster based on user input
+  uri:
+    url: "{{ assistedInstallerURLClusters }}"
+    method: POST
+    # url_username: "{{ HTTP_AUTH_USERNAME }}"
+    # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+    body_format: json
+    status_code: [201]
+    return_content: True
+    body: {
+        "name": "{{ clusterName }}",
+        "openshift_version": "{{ clusterVersion }}",
+        "base_dns_domain": "{{ clusterBaseDomain }}",
+        "cluster_network_cidr": "{{ clusterNetworkCIDRPod }}",
+        "cluster_network_host_prefix": "{{ clusterNetworkHostPrefix }}",
+        "service_network_cidr": "{{ clusterNetworkCIDRService }}",
+        "ingress_vip": "{{ clusterEndpointIPIngress }}",
+        "pull_secret": "{{ userAuthPullSecret | to_json }}",
+        "ssh_public_key": "{{ userAuthSSHKeyPublic }}",
+        "vip_dhcp_allocation": "{{ clusterEndpointIPAPIDHCP | lower | bool }}",
+        "api_vip": "{{ clusterEndpointIPAPI }}",
+        "http_proxy": "{{ clusterNetworkProxyHTTP }}",
+        "https_proxy": "{{ clusterNetworkProxyHTTPS }}",
+        "no_proxy": "{{ clusterNetworkProxyNo }}"
+    }
+  when: state == 'create'
+  register: http_reply
+
+- debug: 
+    var: http_reply.json
+  when: debug and state == 'create'
+
+- name: Set the cluster ID
+  set_fact:
+    cluster_id: "{{ http_reply.json.id }}"
+    name: "{{ http_reply.json.name }}"
+  when: state == 'create'
+
+########
+- debug: msg="Current clusterID is {{ cluster_id }}"
+
+
+# - name: set variable for current clusterID
+#   set_fact:
+#     shared_variable: "{{ cluster_id }}"
+# - name: add variables to dummy host
+#   add_host:
+#     name: "variable_holder"
+#     shared_variable:  "{{ shared_variable }}"
+
+########
+- name: register a dummy inventory host with current clusterID variable
+  add_host:
+    name: "DUMMY_HOST"
+    currentClusterID: "{{ cluster_id }}"
+
+- name: "Show the user the recorded currentClusterID via DUMMY_HOST"
+  debug: msg="Step 1 - In the same playbook currentClusterID {{ hostvars['DUMMY_HOST']['currentClusterID'] }}"
+    # var: "{{ hostvars['DUMMY_HOST']['currentClusterID'] }}"
+
+########
+- name: ensure that .cluster local directory exists to store cluster information
+  file:
+    path: ./.clusters/{{ cluster_id }}
+    state: directory
+  delegate_to: localhost
+  when: state == 'create'
+
+- local_action: copy content="{{ http_reply | to_nice_json }}" dest=./.clusters/{{ cluster_id }}/{{ cluster_id }}.json
+  when: state == 'create'

@@ -1,0 +1,201 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Instructions: 
+# Edit the variables below for each of the libvirtGuests, hosts, the 
+# Assisted Installer API endpoint, and the clusterID.
+#
+
+# To run:
+# ansible-playbook -i [inventory] 00-deleteAll.yml -vv
+# Example: ansible-playbook -i inventory/jinkit.yml 00-createAll.yml -vv
+
+## ai.openshift.jinkit.com
+## Initialize an OCP cluster to API at ai.openshift.jinkit.com
+- hosts: ai.openshift.jinkit.com
+  roles:
+    - createAICluster
+
+# ## Local Action
+# ## Show variable for currentClusterID
+# - hosts: ai.openshift.jinkit.com
+#   tasks:
+#   - name: "Show the user the recorded currentClusterID via DUMMY_HOST"
+#     debug: msg="Step 2 - In between playbooks currentClusterID {{ hostvars['DUMMY_HOST']['currentClusterID'] }}"
+
+# ## ai.openshift.jinkit.com
+# ## Test connectivity to API at ai.openshift.jinkit.com
+# - hosts: ai.openshift.jinkit.com
+#   gather_facts: true
+#   roles: 
+#     - testSetup
+
+## Local Action
+## Download ISO to to localhost from ai.openshift.jinkit.com
+- hosts: ai.openshift.jinkit.com
+  roles:
+    - downloadAIClusterISO
+
+## Group libvirtOCPHosts
+## Upload ISO to galvatron01, galvatron02, galvatron03 (Supermicro E300)
+- hosts: libvirtOCPHosts
+  gather_facts: false
+  become: yes
+  roles:
+    - uploadAIClusterISO
+
+## kubenode04
+## Create libvirtGuestTemplate: kubenode31 on host galvatron01.jinkit.com
+- hosts: galvatron01.jinkit.com
+  gather_facts: false
+  become: yes
+  roles:
+    - createAILibvirtGuestTemplates
+  vars:
+    - clusterID: "{{ hostvars['DUMMY_HOST']['currentClusterID'] }}"
+    - libvirtHostName: "galvatron01.jinkit.com"
+    - libvirtGuestName: "kubenode31"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+    - dirRemoteLibvirtBoot: "/var/lib/libvirt/boot"
+    - dirRemoteLibvirtImages: "/var/lib/libvirt/images"
+    - fileLocalISO: "./.clusters/${clusterID}/{{ clusterID }}.iso"
+    - fileRemoteISO: "{{ dirRemoteLibvirtBoot }}/ai-discovery-{{ clusterID }}.iso"
+    - fileRemoteLibvirtGuestLog: "{{ dirRemoteLibvirtBase }}/{{ libvirtGuestName }}/{{ libvirtGuestName }}.log"
+    - libvirtGuestExecutionDelay: "8"
+    - libvirtGuestVirtType: "kvm"
+    - libvirtGuestComputeMemory: "32768"
+    - libvirtGuestComputeVCPUs: "6"
+    - libvirtGuestAccelerate: "True"
+    - libvirtGuestAutoStart: "True"
+    - libvirtGuestOSVariant: "rhel8.3"
+    - libvirtGuestDiskCDROM: "/var/lib/libvirt/boot/ai-discovery-{{ clusterID }}.iso"
+    - libvirtGuestDiskPath: "/var/lib/libvirt/images/{{ libvirtGuestName }}.qcow2"
+    - libvirtGuestDiskSize: "120"
+    - libvirtGuestDiskBus: "virtio"
+    - libvirtGuestDiskFormat: "qcow2"
+    - libvirtGuestNetworkMAC: "0e:00:00:03:60:31"
+    - libvirtGuestNetworkBridge: "br60"
+    - libvirtGuestNetworkModel: "virtio"
+    - libvirtGuestGraphicsVNCPort: "5931"
+    - libvirtGuestGraphicsVNCListen: "0.0.0.0"
+    - libvirtGuestGraphicsVNCPassword: "redhat"
+
+## kubenode05
+## Create libvirtGuestTemplate: kubenode32 on host galvatron02.jinkit.com
+- hosts: galvatron02.jinkit.com
+  gather_facts: false
+  become: yes
+  roles:
+    - createAILibvirtGuestTemplates
+  vars:
+    - clusterID: "{{ hostvars['DUMMY_HOST']['currentClusterID'] }}"
+    - libvirtHostName: "galvatron02.jinkit.com"
+    - libvirtGuestName: "kubenode32"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+    - dirRemoteLibvirtBoot: "/var/lib/libvirt/boot"
+    - dirRemoteLibvirtImages: "/var/lib/libvirt/images"
+    - fileLocalISO: "./.clusters/${clusterID}/{{ clusterID }}.iso"
+    - fileRemoteISO: "{{ dirRemoteLibvirtBoot }}/ai-discovery-{{ clusterID }}.iso"
+    - fileRemoteLibvirtGuestLog: "{{ dirRemoteLibvirtBase }}/{{ libvirtGuestName }}/{{ libvirtGuestName }}.log"
+    - libvirtGuestExecutionDelay: "8"
+    - libvirtGuestVirtType: "kvm"
+    - libvirtGuestComputeMemory: "32768"
+    - libvirtGuestComputeVCPUs: "6"
+    - libvirtGuestAccelerate: "True"
+    - libvirtGuestAutoStart: "True"
+    - libvirtGuestOSVariant: "rhel8.3"
+    - libvirtGuestDiskCDROM: "/var/lib/libvirt/boot/ai-discovery-{{ clusterID }}.iso"
+    - libvirtGuestDiskPath: "/var/lib/libvirt/images/{{ libvirtGuestName }}.qcow2"
+    - libvirtGuestDiskSize: "120"
+    - libvirtGuestDiskBus: "virtio"
+    - libvirtGuestDiskFormat: "qcow2"
+    - libvirtGuestNetworkMAC: "0e:00:00:03:60:32"
+    - libvirtGuestNetworkBridge: "br60"
+    - libvirtGuestNetworkModel: "virtio"
+    - libvirtGuestGraphicsVNCPort: "5932"
+    - libvirtGuestGraphicsVNCListen: "0.0.0.0"
+    - libvirtGuestGraphicsVNCPassword: "redhat"
+
+## kubenode06
+## Create libvirtGuestTemplate: kubenode33 on host galvatron03.jinkit.com
+- hosts: galvatron03.jinkit.com
+  gather_facts: false
+  become: yes
+  roles:
+    - createAILibvirtGuestTemplates
+  vars:
+    - clusterID: "{{ hostvars['DUMMY_HOST']['currentClusterID'] }}"
+    - libvirtHostName: "galvatron03.jinkit.com"
+    - libvirtGuestName: "kubenode33"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+    - dirRemoteLibvirtBoot: "/var/lib/libvirt/boot"
+    - dirRemoteLibvirtImages: "/var/lib/libvirt/images"
+    - fileLocalISO: "./.clusters/${clusterID}/{{ clusterID }}.iso"
+    - fileRemoteISO: "{{ dirRemoteLibvirtBoot }}/ai-discovery-{{ clusterID }}.iso"
+    - fileRemoteLibvirtGuestLog: "{{ dirRemoteLibvirtBase }}/{{ libvirtGuestName }}/{{ libvirtGuestName }}.log"
+    - libvirtGuestExecutionDelay: "8"
+    - libvirtGuestVirtType: "kvm"
+    - libvirtGuestComputeMemory: "32768"
+    - libvirtGuestComputeVCPUs: "6"
+    - libvirtGuestAccelerate: "True"
+    - libvirtGuestAutoStart: "True"
+    - libvirtGuestOSVariant: "rhel8.3"
+    - libvirtGuestDiskCDROM: "/var/lib/libvirt/boot/ai-discovery-{{ clusterID }}.iso"
+    - libvirtGuestDiskPath: "/var/lib/libvirt/images/{{ libvirtGuestName }}.qcow2"
+    - libvirtGuestDiskSize: "120"
+    - libvirtGuestDiskBus: "virtio"
+    - libvirtGuestDiskFormat: "qcow2"
+    - libvirtGuestNetworkMAC: "0e:00:00:03:60:33"
+    - libvirtGuestNetworkBridge: "br60"
+    - libvirtGuestNetworkModel: "virtio"
+    - libvirtGuestGraphicsVNCPort: "5933"
+    - libvirtGuestGraphicsVNCListen: "0.0.0.0"
+    - libvirtGuestGraphicsVNCPassword: "redhat"
+
+## kubenode04
+## Start libvirtGuest: kubenode31 on host galvatron01.jinkit.com
+- hosts: galvatron01.jinkit.com
+  collections:
+    - community.libvirt.virt
+  gather_facts: false
+  become: yes
+  roles:
+    - startAILibvirtGuest
+  vars:
+    - libvirtGuestName: "kubenode31"
+
+## kubenode05
+## Start libvirtGuest: kubenode32 on host galvatron02.jinkit.com
+- hosts: galvatron02.jinkit.com
+  collections:
+    - community.libvirt.virt
+  gather_facts: false
+  become: yes
+  roles:
+    - startAILibvirtGuest
+  vars:
+    - libvirtGuestName: "kubenode32"
+
+## kubenode06
+## Start libvirtGuest: kubenode33 on host galvatron03.jinkit.com
+- hosts: galvatron03.jinkit.com
+  collections:
+    - community.libvirt.virt
+  gather_facts: false
+  become: yes
+  roles:
+    - startAILibvirtGuest
+  vars:
+    - libvirtGuestName: "kubenode33"

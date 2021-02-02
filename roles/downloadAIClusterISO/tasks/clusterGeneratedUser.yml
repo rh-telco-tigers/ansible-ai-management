@@ -1,0 +1,203 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# 1
+- name: Generating the cluster ISO
+  uri:
+    url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/image"
+    method: POST
+    # url_username: "{{ HTTP_AUTH_USERNAME }}"
+    # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+    body_format: json
+    status_code: [201]
+    return_content: True
+    body: {
+        "ssh_public_key": "{{ userAuthSSHKeyPublic }}"
+    }
+  register: http_reply
+
+- debug: 
+    var: http_reply.json
+  when: debug
+
+# 2
+- name: Downloading the cluster ISO
+  uri:
+    url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/image"
+    method: GET
+    # url_username: "{{ HTTP_AUTH_USERNAME }}"
+    # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+    status_code: [200]
+    dest: ./.clusters/{{ clusterID }}/{{ clusterID }}.iso
+    follow_redirects: yes
+  delegate_to: localhost
+
+# 3
+- name: Create directory to store cluster installation files
+  file:
+    path: ./.clusters/{{ clusterID }}/files
+    state: directory
+  delegate_to: localhost
+
+# 4
+- name: Downloading the cluster installation configuration
+  uri:
+    url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/install-config"
+    method: GET
+    # url_username: "{{ HTTP_AUTH_USERNAME }}"
+    # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+    status_code: [200]
+    # dest: ./.clusters/{{ clusterID }}/files/install-config | to_pretty_yaml
+    follow_redirects: yes
+  delegate_to: localhost
+  register: http_reply
+
+# 5
+- local_action: copy content="{{ http_reply | to_nice_json }}" dest=./.clusters/{{ clusterID }}/files/install-config
+# - local_action: copy content="{{ http_reply.json | to_nice_yaml }}" dest=./.clusters/{{ clusterID }}/files/install-config
+
+# Brining down the hammer for demo with customer.
+# TODO: bbj - Do this the right way when I have some more time.
+# - name: Clean up the local copy of installation config
+#   shell: sed -i 1d ./.clusters/{{ clusterID }}/files/install-config
+#   delegate_to: localhost
+
+# - name: Clean up local copy of the installation config
+#   lineinfile:
+#     dest: ./.clusters/{{ clusterID }}/files/install-config
+#     regexp: '^\|-'
+#   state: absent
+#   delegate_to: localhost
+
+# 6
+- name: Downloading the cluster discovery ignition file
+  uri:
+    url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/discovery-ignition"
+    method: GET
+    # url_username: "{{ HTTP_AUTH_USERNAME }}"
+    # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+    status_code: [200]
+    # dest: ./.clusters/{{ clusterID }}/files/install-config | to_pretty_yaml
+    follow_redirects: yes
+  delegate_to: localhost
+  register: http_reply
+
+# 7
+#- local_action: copy content="{{ http_reply | to_nice_yaml }}" dest=./.clusters/{{ clusterID }}/files/discovery-ignition
+- local_action: copy content="{{ http_reply.json.config }}" dest=./.clusters/{{ clusterID }}/files/discovery-ignition
+
+
+
+  # when: state == 'create'
+
+# - name: Download ignition file - bootstrap.ign
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/bootstrap.ign"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/bootstrap.ign
+#     follow_redirects: yes
+#   delegate_to: localhost
+
+# - name: Download ignition file - master.ign
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/master.ign"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/master.ign
+#     follow_redirects: yes
+#   delegate_to: localhost
+
+# - name: Download ignition file - metadata.json
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/metadata.json"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/metadata.json
+#     follow_redirects: yes
+#   delegate_to: localhost
+
+# - name: Download ignition file - worker.ign
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/worker.ign"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/worker.ign
+#     follow_redirects: yes
+#   delegate_to: localhost
+
+# - name: Download ignition file - kubeadmin-password
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/kubeadmin-password"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/kubeadmin-password
+#     follow_redirects: yes
+#   delegate_to: localhost
+
+# - name: Download ignition file - kubeconfig
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/kubeconfig"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/kubeconfig
+#     follow_redirects: yes
+#   delegate_to: localhost
+
+# - name: Download ignition file - kubeconfig-noingress
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/kubeconfig-noingress"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/kubeconfig-noingress
+#     follow_redirects: yes
+#   delegate_to: localhost
+
+# - name: Download ignition file - install-config.yaml
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/install-config.yaml"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/install-config.yaml
+#     follow_redirects: yes
+#   delegate_to: localhost
+
+# - name: Download ignition file - discovery.ign
+#   uri:
+#     url: "{{ assistedInstallerURLClusters }}/{{ clusterID }}/downloads/files/discovery.ign"
+#     method: GET
+#     # url_username: "{{ HTTP_AUTH_USERNAME }}"
+#     # url_password: "{{ HTTP_AUTH_PASSWORD }}"
+#     status_code: [200]
+#     dest: ./.clusters/{{ clusterID }}/files/discovery.ign
+#     follow_redirects: yes
+#   delegate_to: localhost

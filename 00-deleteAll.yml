@@ -1,0 +1,105 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Instructions: 
+# Edit the variables below for each of the libvirtGuests, hosts, the 
+# Assisted Installer API endpoint, and the clusterID.
+#
+
+# To run:
+# ansible-playbook -i [inventory] 00-deleteAll.yml -vv
+# Example: ansible-playbook -i inventory/jinkit.yml 00-deleteAll.yml -vv
+
+## galvatron01
+## Remove libvirtGuest: kubenode31 on host galvatron01.jinkit.com
+- hosts: galvatron01.jinkit.com
+  collections:
+    - community.libvirt.virt
+  gather_facts: false
+  become: yes
+  roles:
+    - deleteAILibvirtGuest
+  vars:
+    - libvirtGuestName: "kubenode31"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+
+# Remove libvirtGuestTemplates: kubenode31 on host galvatron01.jinkit.com
+- hosts: galvatron01.jinkit.com
+  gather_facts: false
+  become: yes
+  roles:
+    - deleteAILibvirtGuestTemplates
+  vars:
+    - libvirtGuestName: "kubenode31"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+
+## galvatron02
+## Remove libvirtGuest: kubenode32 on host galvatron02.jinkit.com
+- hosts: galvatron02.jinkit.com
+  collections:
+    - community.libvirt.virt
+  gather_facts: false
+  become: yes
+  roles:
+    - deleteAILibvirtGuest
+  vars:
+    - libvirtGuestName: "kubenode32"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+
+# Remove libvirtGuestTemplates: kubenode32 on host galvatron02.jinkit.com
+- hosts: galvatron02.jinkit.com
+  gather_facts: false
+  become: yes
+  roles:
+    - deleteAILibvirtGuestTemplates
+  vars:
+    - libvirtGuestName: "kubenode32"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+
+## galvatron03
+## Remove libvirtGuest: kubenode33 on host galvatron03.jinkit.com
+- hosts: galvatron03.jinkit.com
+  collections:
+    - community.libvirt.virt
+  gather_facts: false
+  become: yes
+  roles:
+    - deleteAILibvirtGuest
+  vars:
+    - libvirtGuestName: "kubenode33"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+
+# Remove libvirtGuestTemplates: kubenode33 on host galvatron03.jinkit.com
+- hosts: galvatron03.jinkit.com
+  gather_facts: false
+  become: yes
+  roles:
+    - deleteAILibvirtGuestTemplates
+  vars:
+    - libvirtGuestName: "kubenode33"
+    - dirRemoteLibvirtBase: "/opt/ocp-demos/libvirt/guests"
+
+# Remove cluster: delete clusterID on ai.openshift.jinkit.com
+- hosts: ai.openshift.jinkit.com
+  roles:
+    - deleteAICluster
+  vars:
+    - clusterID: "2086a2f9-3abc-4f71-a08e-503fb184376e"
+    - secure: False
+    - state: delete
+    - assistedInstallerHost: "{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}"
+    - assistedInstallerPort: 8090
+    - assistedInstallerURLBase: "{{ secure | ternary('https', 'http') }}://{{ assistedInstallerHost }}:{{ assistedInstallerPort }}/api/assisted-install/v1"
+    - assistedInstallerURLClusters: "{{ assistedInstallerURLBase }}/clusters"

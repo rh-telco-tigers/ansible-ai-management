@@ -1,0 +1,79 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# New Ideas:
+allowClusterNameDuplication: True
+
+# Global Details:
+secure: False
+state: create
+debug: True
+disconnected: False
+
+# Cluster Details (order is important):
+clusterID: "f0fa43e3-a463-400c-abd8-61db8d7438e6"
+clusterName: "mgmt"
+clusterVersion: "4.6"
+clusterBaseDomain: "jinkit.com"
+clusterNetworkHostPrefix: 24
+clusterEndpointIPAPI: "192.168.60.50"
+clusterEndpointIPAPIDHCP: "false"
+clusterEndpointIPIngress: "192.168.60.51"
+clusterEndpointIPIngressDHCP: "false"
+clusterNetworkProxyHTTP: ""
+clusterNetworkProxyHTTPS: ""
+clusterNetworkProxyNo: ""
+clusterNetworkUserManaged: "false"
+clusterNetworkCIDRPod: "10.128.0.0/14"
+clusterNetworkCIDRService: "172.30.0.0/16"
+
+# User Details:
+userAuthSSHKeyPublic: "{{ lookup('file', '/Users/bjozsa/.ssh/id_rsa.pub') }}"
+userAuthPullSecret: "{{ lookup('file', '/Users/bjozsa/.ocp/pull_secret.json') }}"
+
+# Assisted Installer Details (order is important):
+assistedInstallerHost: "{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}"
+assistedInstallerPort: 8090
+assistedInstallerURLBase: "{{ secure | ternary('https', 'http') }}://{{ assistedInstallerHost }}:{{ assistedInstallerPort }}/api/assisted-install/v1"
+assistedInstallerURLClusters: "{{ assistedInstallerURLBase }}/clusters"
+assistedInstallerURLCredentials: "{{ assistedInstallerURLBase }}/clusters/{{ clusterID }}/credentials"
+
+
+
+
+
+
+
+
+
+# # These values will be removed:
+# ssh_public_key: "{{ lookup('file', '/Users/bjozsa/.ssh/id_rsa.pub') }}"
+# pull_secret: "{{ lookup('file', '/Users/bjozsa/.ocp/pull_secret.json') }}"
+# create: True
+# HTTP_PROXY: ""
+# HTTPS_PROXY: ""
+# NO_PROXY: ""
+# NODEIP_PROJECT_NAME: "son-of-spike"
+# AUTORULES_PROJECT_NAME: "autorules"
+# AUTORULES_MATCH_RULE: ".*remote.*"
+# AUTORULES_MATCH_ROLE: "remote-worker"
+# URL_MIRROR_DOWNLOAD_RHCOS_LIVE_ISO: https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/latest/rhcos-live.x86_64.iso
+# ASSISTED_INSTALLER_HOST: "{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}"
+# ASSISTED_INSTALLER_PORT: 8090
+# ASSISTED_INSTALLER_BASE_URL: "{{ secure | ternary('https', 'http') }}://{{ ASSISTED_INSTALLER_HOST }}:{{ ASSISTED_INSTALLER_PORT }}/api/assisted-install/v1"
+# URL_ASSISTED_INSTALLER_CLUSTER: "{{ ASSISTED_INSTALLER_BASE_URL }}/clusters"
+# URL_ASSISTED_INSTALLER_CLUSTER_CREDENTIALS: "{{ ASSISTED_INSTALLER_BASE_URL }}/clusters/{{ CLUSTER_ID }}/credentials"
+# URL_ASSISTED_INSTALLER_CLUSTER_LIST: "{{ ASSISTED_INSTALLER_BASE_URL }}/clusters"

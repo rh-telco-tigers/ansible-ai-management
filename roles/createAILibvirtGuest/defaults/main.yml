@@ -1,0 +1,56 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Cluster Details (order is important):
+clusterID: "622fa8ca-e797-4185-8230-b40ebcb6187b"
+fileLocalISO: ./.clusters/{{ clusterID }}/{{ clusterID }}.iso
+fileRemoteISO: /var/lib/libvirt/boot/ai-discovery-{{ clusterID }}.iso
+
+libvirtGuestName: kubenode22
+libvirtGuestVirtType: kvm
+libvirtGuestComputeMemory: 16384
+libvirtGuestComputeVCPUs: 4
+libvirtGuestAccelerate: True
+libvirtGuestAutoStart: True
+libvirtGuestOSVariant: "rhel8.3"
+libvirtGuestDiskCDROM: "{{ fileRemoteISO }}"
+libvirtGuestDiskPath: "/var/lib/libvirt/images/{{ libvirtGuestName }}.qcow2"
+libvirtGuestDiskSize: "120"
+libvirtGuestDiskBus: "virtio"
+libvirtGuestDiskFormat: "qcow2"
+libvirtGuestNetworkMAC: "0e:00:00:03:60:21"
+libvirtGuestNetworkBridge: "br60"
+libvirtGuestNetworkModel: virtio
+libvirtGuestGraphicsVNCPort: 5921
+libvirtGuestGraphicsVNCListen: "0.0.0.0"
+libvirtGuestGraphicsVNCPassword: "redhat"
+
+
+# virt-install --virt-type={{ libvirtGuestVirtType }} --name {{ libvirtGuestName }} --memory {{ libvirtGuestComputeMemory }} --vcpus={{ libvirtGuestComputeVCPUs }} --accelerate --autostart --os-variant={{ libvirtGuestOSVariant }} --cdrom={{ libvirtGuestDiskCDROM }} --network=mac={{ libvirtGuestNetworkMAC }},bridge={{ libvirtGuestNetworkBridge }},model={{ libvirtGuestNetworkModel }} --graphics vnc,port={{ libvirtGuestGraphicsVNCPort }},listen={{ libvirtGuestGraphicsVNCListen }},password={{ libvirtGuestGraphicsVNCPassword }} --disk path=/var/lib/libvirt/images/{{ libvirtGuestName }}.qcow2,size={{ libvirtGuestDiskSize }},bus={{ libvirtGuestDiskBus }},format={{ libvirtGuestDiskFormat }} > $KUBENODE_LOGFILE 2>&1 &
+
+
+# sudo virt-install \
+#   --virt-type={{ libvirtGuestVirtType }}  \
+#   --name {{ libvirtGuestName }} \
+#   --memory {{  }} \
+#   --vcpus={{  }} \
+#   --accelerate \
+#   --autostart \
+#   --os-variant={{ libvirtGuestOSVariant }} \
+#   --cdrom={{ libvirtGuestDiskCDROM }} \
+#   --network=mac={{ libvirtGuestNetworkMAC }},bridge={{ libvirtGuestNetworkBridge }},model={{ libvirtGuestNetworkModel }} \
+#   --graphics vnc,port={{ libvirtGuestGraphicsVNCPort }},listen={{ libvirtGuestGraphicsVNCListen }},password={{ libvirtGuestGraphicsVNCPassword }} \
+#   --disk path=/var/lib/libvirt/images/{{ libvirtGuestName }}.qcow2,size={{ libvirtGuestDiskSize }},bus={{ libvirtGuestDiskBus }},format={{ libvirtGuestDiskFormat }} > $KUBENODE_LOGFILE 2>&1 &

@@ -1,0 +1,55 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Consider adding a checksum option for original to destination in order to 
+# force a recreation in cases where needed.
+
+- name: Auto-generated currentClusterID - Remove previous ISO in preparation for ISO refresh
+  ansible.builtin.file:
+    path: "/var/lib/libvirt/boot/ai-discovery-{{ hostvars['DUMMY_HOST']['currentClusterID'] }}.iso"
+    state: absent
+  when: hostvars['DUMMY_HOST']['currentClusterID'] is defined
+
+- name: Auto-generated currentClusterID - Copy local discovery ISO to target libvirt host
+  copy:
+    src: "./.clusters/{{ hostvars['DUMMY_HOST']['currentClusterID'] }}/{{ hostvars['DUMMY_HOST']['currentClusterID'] }}.iso"
+    dest: "/var/lib/libvirt/boot/ai-discovery-{{ hostvars['DUMMY_HOST']['currentClusterID'] }}.iso"
+    force: yes
+  when: hostvars['DUMMY_HOST']['currentClusterID'] is defined
+
+- name: User-supplied clusterID - Remove previous ISO in preparation for ISO refresh
+  ansible.builtin.file:
+    path: "/var/lib/libvirt/boot/ai-discovery-{{ clusterID }}.iso"
+    state: absent
+  when: hostvars['DUMMY_HOST']['currentClusterID'] is not defined
+
+- name: User-supplied clusterID - Copy local discovery ISO to target libvirt host
+  copy:
+    src: "./.clusters/{{ clusterID }}/{{ clusterID }}.iso"
+    dest: "/var/lib/libvirt/boot/ai-discovery-{{ clusterID }}.iso"
+    force: yes
+  when: hostvars['DUMMY_HOST']['currentClusterID'] is not defined
+
+
+# fileLocalISO: ./.clusters/{{ clusterID }}/{{ clusterID }}.iso
+# fileRemoteISO: /var/lib/libvirt/boot/ai-discovery-{{ clusterID }}.iso
+
+
+# - local_action: copy content="{{ http_reply_auto.json.config }}" dest=./.clusters/{{ hostvars['DUMMY_HOST']['currentClusterID'] }}/files/discovery-ignition
+#   when: hostvars['DUMMY_HOST']['currentClusterID'] is defined
+
+# - local_action: copy content="{{ http_reply.json.config }}" dest=./.clusters/{{ clusterID }}/files/discovery-ignition
+#   when: hostvars['DUMMY_HOST']['currentClusterID'] is not defined

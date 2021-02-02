@@ -1,0 +1,10 @@
+export KUBENODE_NAME=kubenode21
+export KUBENODE_MAC="0e:00:00:03:60:21"
+export KUBENODE_BRIDGE="br60"
+export KUBENODE_KVMPORT=5921
+export KUBENODE_KVMPASSWD=redhat
+export KUBENODE_DISKSIZE=120
+export KUBENODE_CPUCORES=4
+export KUBENODE_MEMORY=16384
+export KUBENODE_LOGFILE="$HOME/"$KUBENODE_NAME"_install.log"
+export KVM_IMAGE=/var/lib/libvirt/boot/ai-discovery-fd352877-8a71-4dfd-8e21-e057a2f9ec13.iso
