@@ -15,10 +15,10 @@
 #
 
 # Only here for testing purposes:
-- hosts: assistedInstaller
-  gather_facts: false
-  roles: 
-    - testPing
+# - hosts: assistedInstaller
+#   gather_facts: false
+#   roles: 
+#     - testPing
 
 - hosts: assistedInstaller
   gather_facts: false
@@ -33,6 +33,8 @@
   become: yes
   roles:
     - deleteAssistedInstaller
+  vars:
+    - forceClean: false
 
 - hosts: assistedInstaller
   collections:
@@ -41,3 +43,5 @@
   become: yes
   roles:
     - configureAssistedInstaller
+  vars:
+    - RHCOS_LIVEISO_CHK: "b264d398cce0affca218ee56808332d90b7c0a6dac2c061effdfa834a86623ba"

@@ -5,6 +5,8 @@ ansible-galaxy collection install containers.podman
 ```
 
 ### Create a New Cluster (with variables)
+Please look at example: `000-createAssistedInstaller.yml`
+
 Defaults _should_ be maintained, which would allow most users to leverage their own inventory file. Please see the sample inventory included with this project. This means that when using the sample inventory file, this playbook would be run like:
 ```
 ansible-playbook -i inventory/sample-inventory.yml \
@@ -29,9 +31,9 @@ To delete the Assisted Installer installation, perform the following:
 ansible-playbook -i inventory/sample-inventory.yml
 ```
 
-If you wish to force remove the directory created for Assisted Installer (`/opt/assisted-installer`) then use the variable `forceClean=true`.
+If you wish to force remove the directory created for Assisted Installer (`/opt/assisted-installer`) then use the variable `forceClean=true`. This may be done when you _don't_ want to persist data (such as previously installed cluster data, etc).
 ```
-ansible-playbook -i inventory/sample-inventory.yml \                                                                                                                                                     ─╯
+ansible-playbook -i inventory/sample-inventory.yml \
 --extra-vars "forceClean=true" \                       
 000-deleteAssistedInstaller.yml -vv --limit "assistedInstaller"
 ```
