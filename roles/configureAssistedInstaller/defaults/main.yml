@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 
-
 # User Details:
 userAuthSSHKeyPublic: "{{ lookup('file', '/Users/bjozsa/.ssh/id_rsa.pub') }}"
 userAuthPullSecret: "{{ lookup('file', '/Users/bjozsa/.ocp/pull_secret.json') }}"
@@ -108,7 +107,7 @@ FILE_DST_ENV_PODMAN: "{{ DIR_OAS_BASE }}/onprem-environment"
 
 # RHCOS Settings:
 RHCOS_LIVEISO_SRC: "https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/pre-release/latest-4.7/rhcos-live.x86_64.iso"
-RHCOS_LIVEISO_CHK: "4bb81d88c66923f6ad46856783ee8e57bf1bbabf0f1ae3ae0b2c2e60101c6832"
+RHCOS_LIVEISO_CHK: "b264d398cce0affca218ee56808332d90b7c0a6dac2c061effdfa834a86623ba"
 RHCOS_LIVEISO_ALG: "sha256"
 RHCOS_LIVEISO_DST: "{{ DIR_OAS_BASE }}/rhcos-live.x86_64.iso"
 
@@ -140,20 +139,20 @@ REGISTRY_TAG_OCP_METAL_DB: "latest"
 
 
 
-INSTALLER_IMAGE: 
-CONTROLLER_IMAGE: 
+#INSTALLER_IMAGE: 
+#CONTROLLER_IMAGE: 
 SERVICE_URL: 
 SERVICE_PORT: 
-AGENT_DOCKER_IMAGE: 
-BASE_DNS_DOMAINS: 
-PUBLIC_CONTAINER_REGISTRIES:
+#AGENT_DOCKER_IMAGE: 
+#BASE_DNS_DOMAINS: 
+#PUBLIC_CONTAINER_REGISTRIES:
 PULL_SECRET: "{{ userAuthPullSecret }}"
 IGNITION_GENERATE_IMAGE:
-IMAGE_BUILDER:
-CONNECTIVITY_CHECK_IMAGE:
+#IMAGE_BUILDER:
+#CONNECTIVITY_CHECK_IMAGE:
 HARDWARE_INFO_IMAGE:
-INVENTORY_IMAGE:
-OCM_BASE_URL:
+#INVENTORY_IMAGE:
+#OCM_BASE_URL:
 
 # Examples:
 ## Experimental: Single Node deployment

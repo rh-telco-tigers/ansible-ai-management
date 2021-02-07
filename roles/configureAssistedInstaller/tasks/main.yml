@@ -18,15 +18,6 @@
 # Assisted Installer API endpoint, and the clusterID.
 #
 
-- name: test to ensure that hosts are alive
-  tags: [test, ping]
-  ping:
-
-- name: Print all available facts
-  tags: [test, facts]
-  ansible.builtin.debug:
-    var: OAS_CFG_PULL_SECRET
-
 # Create directories and files for AI
 - name: Create a directory for assisted installer resources
   tags: [createDirs, createDirAIResources]
@@ -133,7 +124,7 @@
       - "{{ OAS_CFG_HOST_LISTENER_PORT }}:8080"
 
 # NOTE: bbj - Come back to clean this up later
-## NOTE: There is no "-d / detatch" option for the containers.podman.podman_pod at this time
+## NOTE: There is no "-d / detach" option for the containers.podman.podman_pod at this time
 - name: Create Assisted Installer Postgresql DB
   tags: [createAssistedInstaller]
   shell:
@@ -141,7 +132,7 @@
        podman run -dt --pod assisted-installer --env-file {{ FILE_DST_ENV_PODMAN }} --volume {{ DIR_OAS_BASE }}/data/postgresql:/var/lib/pgsql:z --name db {{ REGISTRY_IMAGE_OCP_METAL_DB }}:{{ REGISTRY_TAG_OCP_METAL_DB }}
 
 # NOTE: bbj - Come back to clean this up later
-## NOTE: There is no "-d / detatch" option for the containers.podman.podman_pod at this time
+## NOTE: There is no "-d / detach" option for the containers.podman.podman_pod at this time
 - name: Create Assisted Installer UI
   tags: [createAssistedInstaller]
   shell:
@@ -149,7 +140,7 @@
        podman run -dt --pod assisted-installer --env-file {{ FILE_DST_ENV_PODMAN }} -v {{ OAS_UI_CONF }}:/opt/bitnami/nginx/conf/server_blocks/nginx.conf:z --pull always --name ui {{ REGISTRY_IMAGE_OCP_METAL_UI }}:{{ REGISTRY_TAG_OCP_METAL_UI }}
 
 # NOTE: bbj - Come back to clean this up later
-## NOTE: There is no "-d / detatch" option for the containers.podman.podman_pod at this time
+## NOTE: There is no "-d / detach" option for the containers.podman.podman_pod at this time
 - name: Create Assisted Installer UI
   tags: [createAssistedInstaller]
   shell:

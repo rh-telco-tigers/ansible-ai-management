@@ -1,5 +1,5 @@
 ---
-# Copyright v1kod3n, and other 'ansible-os-traveling-circus' contributors.
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,21 +14,3 @@
 # limitations under the License.
 #
 
-- hosts: assistedInstaller
-  gather_facts: false
-  roles: 
-    - testPing
-
-- hosts: assistedInstaller
-  gather_facts: false
-  become: yes
-  roles: 
-    - installPodman
-
-- hosts: assistedInstaller
-  collections:
-    - containers.podman
-  gather_facts: true
-  become: yes
-  roles:
-    - configureAssistedInstaller
