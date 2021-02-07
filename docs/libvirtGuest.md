@@ -1,6 +1,12 @@
 # Introduction
 This document is intended to serve as a reference for the playbooks related to `libvirtGuests`.
 
+## NOTES: NEW
+You will need to install the community.libvirt module in order to use this playbook.
+```
+ansible-galaxy collection install community.libvirt
+```
+
 ### Creating a libvirtGuest
 Creating a `libvirtGuest` can be achieved by atomic management-related tasks. The first task is intended to generate `libvirtGuest` templates written in [BASH](https://en.wikipedia.org/wiki/Bash_(Unix_shell)). The second is to then execute those scripts.
 

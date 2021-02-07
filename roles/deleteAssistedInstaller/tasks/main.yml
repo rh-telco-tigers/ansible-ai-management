@@ -18,9 +18,6 @@
 # Assisted Installer API endpoint, and the clusterID.
 #
 
-- name: test to ensure that hosts are alive
-  ping:
-
 - name: Assisted Installer - delete installer container
   tags: [deleteAI]
   containers.podman.podman_container:
@@ -44,3 +41,9 @@
   containers.podman.podman_pod:
     name: assisted-installer
     state: absent
+
+- name: Assisted Installer - force remove directory /opt/assisted-installer
+  ansible.builtin.file:
+    path: /opt/assisted-service
+    state: absent
+  when: forceClean|default(false)|bool

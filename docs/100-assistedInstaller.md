@@ -13,7 +13,7 @@ clusterNetworkUserManaged="false"
 clusterNetworkCIDRPod="10.128.0.0/14"
 clusterNetworkCIDRService="172.30.0.0/16"
 
-ansible-playbook -i inventory/jinkit.yml \
+ansible-playbook -i inventory/sample-inventory.yml \
 --extra-vars "clusterName=${clusterName}" \
 --extra-vars "clusterVersion=${clusterVersion}" \
 --extra-vars "clusterBaseDomain=${clusterBaseDomain}" \

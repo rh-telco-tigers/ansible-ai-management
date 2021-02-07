@@ -1,0 +1,46 @@
+---
+# Copyright Brandon B. Jozsa, v1k0d3n, Red Hat and other contributors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Instructions: 
+# Edit the variables below for each of the libvirtGuests, hosts, the 
+# Assisted Installer API endpoint, and the clusterID.
+#
+
+# This inventory is a sample inventory. Change hostnames, but pay close attention to 
+# groups if using the playbooks at the root of the directory (i.e. 00-createAll.yml, etc).
+
+all:
+  hosts:
+    ai.openshift.jinkit.com:
+      ansible_host: 192.168.3.27
+      ansible_user: cloud-user
+    kubenode01.jinkit.com:
+      ansible_host: 192.168.3.21
+      ansible_user: cloud-user
+    kubenode02.jinkit.com:
+      ansible_host: 192.168.3.22
+      ansible_user: cloud-user
+    kubenode03.jinkit.com:
+      ansible_host: 192.168.3.23
+      ansible_user: cloud-user
+  children:
+    assistedInstaller:
+      hosts:
+        ai.openshift.jinkit.com:
+    libvirtOCPHosts:
+      hosts:
+        kubenode01.jinkit.com:
+        kubenode02.jinkit.com:
+        kubenode03.jinkit.com:
